@@ -26,11 +26,10 @@ import java.util.stream.Collectors;
 @Service
 public class VerifyCodeServiceImpl implements VerifyCodeService {
 
-    private static final BigDecimal coordinateCore = new BigDecimal("0.2000");
+    public static final String pathStr = "F:\\workspace\\images\\";
 
     @Override
     public Map<String, Object> getOne() {
-        String pathStr = "F:\\workspace\\images\\";
         Path rootPath = Paths.get(pathStr);
         List<Path> imagesList = null;
         try {
@@ -82,7 +81,7 @@ public class VerifyCodeServiceImpl implements VerifyCodeService {
         if (id == null || dtoArr == null || dtoArr.length < 2) return null;
         HashMap<String, Object> ans = new HashMap<>();
         // 读取id图片信息
-        Path path = Paths.get("F:\\workspace\\images\\" + id + ".txt");
+        Path path = Paths.get(pathStr + id + ".txt");
         List<String> txtAllLines;
         try {
             txtAllLines = Files.readAllLines(path);
@@ -101,15 +100,8 @@ public class VerifyCodeServiceImpl implements VerifyCodeService {
             String txtAllLine = txtAllLines.get(i);
             String[] lineArr = txtAllLine.split(" ");
             CoordinateDTO coordinateDTO = dtoArr[i];
-//            Integer iconId = coordinateDTO.getIconId();
             BigDecimal x1 = coordinateDTO.getX1();
-//            BigDecimal x2 = coordinateDTO.getX2();
             BigDecimal y1 = coordinateDTO.getY1();
-//            BigDecimal y2 = coordinateDTO.getY2();
-
-//            if (Integer.parseInt(lineArr[0]) != iconId) {
-//                return this.handleMsg(ans, 400003, "验证信息有误-图标异常");
-//            }
 
             // 位置
             BigDecimal dbX1 = new BigDecimal(lineArr[1]);
@@ -120,18 +112,10 @@ public class VerifyCodeServiceImpl implements VerifyCodeService {
             if (dbX1.subtract(dbX2Core).compareTo(x1) > -1 || dbX1.add(dbX2Core).compareTo(x1) < 1) {
                 return this.handleMsg(ans, 400004, "验证信息有误-" + i + "-x1异常");
             }
-//            BigDecimal dbX2 = new BigDecimal(lineArr[2]);
-//            if (dbX2.subtract(coordinateCore).compareTo(x2) > -1 || dbX2.add(coordinateCore).compareTo(x2) < 1) {
-//                return this.handleMsg(ans, 400005, "验证信息有误-x2异常");
-//            }
             BigDecimal dbY1 = new BigDecimal(lineArr[2]);
             if (dbY1.subtract(dbY2Core).compareTo(y1) > -1 || dbY1.add(dbY2Core).compareTo(y1) < 1) {
                 return this.handleMsg(ans, 400006, "验证信息有误-" + i + "-y1异常");
             }
-//            BigDecimal dbY2 = new BigDecimal(lineArr[4]);
-//            if (dbY2.subtract(coordinateCore).compareTo(y2) > -1 || dbY2.add(coordinateCore).compareTo(y2) < 1) {
-//                return this.handleMsg(ans, 400007, "验证信息有误-y2异常");
-//            }
         }
         return this.handleMsg(ans, 200, "OK");
     }
