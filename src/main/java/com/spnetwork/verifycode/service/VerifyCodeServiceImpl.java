@@ -2,6 +2,7 @@ package com.spnetwork.verifycode.service;
 
 import com.spnetwork.verifycode.dto.CoordinateDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Base64Utils;
 
@@ -27,10 +28,14 @@ import java.util.stream.Collectors;
 public class VerifyCodeServiceImpl implements VerifyCodeService {
 
     public static final String pathStr = "F:\\workspace\\images\\";
+    @Value("${verify.code.image}")
+    private String imagePath;
+    @Value("${verify.code.txt}")
+    private String txtPath;
 
     @Override
     public Map<String, Object> getOne() {
-        Path rootPath = Paths.get(pathStr);
+        Path rootPath = Paths.get(imagePath);
         List<Path> imagesList = null;
         try {
             imagesList = Files.list(rootPath).filter(path -> {
@@ -54,7 +59,7 @@ public class VerifyCodeServiceImpl implements VerifyCodeService {
             String imageBase64 = Base64Utils.encodeToString(imageByte);
             HashMap<String, Object> specialMap = new HashMap<>();
 
-            Path pathText = Paths.get(pathStr + id + ".txt");
+            Path pathText = Paths.get(txtPath + id + ".txt");
             List<String> txtAllLines;
             try {
                 txtAllLines = Files.readAllLines(pathText);
@@ -81,7 +86,7 @@ public class VerifyCodeServiceImpl implements VerifyCodeService {
         if (id == null || dtoArr == null || dtoArr.length < 2) return null;
         HashMap<String, Object> ans = new HashMap<>();
         // 读取id图片信息
-        Path path = Paths.get(pathStr + id + ".txt");
+        Path path = Paths.get(txtPath + id + ".txt");
         List<String> txtAllLines;
         try {
             txtAllLines = Files.readAllLines(path);
