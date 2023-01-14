@@ -15,7 +15,7 @@ public class IndexController {
 
     @GetMapping
     public String getIndex() {
-        return "/verifycode/index";
+        return "/verifycode/index.html";
     }
 
 }
