@@ -7,79 +7,96 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <!-- 生产环境版本，优化了尺寸和速度 -->
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-<!--    &lt;!&ndash; 引入样式 &ndash;&gt;-->
-<!--    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">-->
-<!--    &lt;!&ndash; 引入组件库 &ndash;&gt;-->
-<!--    <script src="https://unpkg.com/element-ui/lib/index.js"></script>-->
 </head>
 <body>
 
-    <div id="app">
-        <img :src="image" @click="rectClick"/>
-    </div>
-    <script>
-        const { createApp } = Vue
-        createApp({
-            data() {
-                return {
-                    image: '',
-                    length: 0,
-                    imageId: 0,
-                    checkParam: []
-                }
-            },
-            mounted() {
-                this.getVerifyCode();
-            },
-            watch: {
-                checkParam(val) {
-                    if (val.length === this.length) {
-                        this.check(val);
-                        this.getVerifyCode();
-                    }
-                },
-            },
-            methods: {
-                getVerifyCode() {
-                    axios({
-                        method: 'get',
-                        url: '/api/verify-code/one',
-                    })
-                    .then((response) => {
-                        this.image = 'data:image/jpeg;base64,' + response.data.data.image;
-                        this.length = response.data.data.length;
-                        this.imageId = response.data.data.imageId;
-                        this.checkParam = [];
-                    });
-                },
-                rectClick(event) {
-                    let obj = {x1: event.offsetX / 344, y1: event.offsetY / 344};
-                    this.checkParam = [...this.checkParam, obj];
-                    // 获取相对于当前所指向对象的位置坐标
-                    // alert('x:' + event.offsetX + "  y:" +  event.offsetY);
-                },
-                check(val) {
-                    let that = this;
-                    axios({
-                        method: 'post',
-                        url: '/api/verify-code/' + that.imageId,
-                        data: {verifyCode: val}
-                        // data: {verifyCode: JSON.stringify(val)}
-                        // params: {requestBody: JSON.stringify(val)}
-                    }).then((response) => {
-                        let data = response.data;
-                        if (data.code !== 200) {
-                            alert("验证码验证异常" + data.message);
-                        } else {
-                            alert("验证通过");
-                        }
-                    });
-                }
+<div id="app">
+    <img :src="image" id="codeImg" @click="rectClick"/>
+</div>
+<script>
+    const {createApp} = Vue
+    createApp({
+        data() {
+            return {
+                image: '',
+                length: 0,
+                imageId: 0,
+                checkParam: []
             }
-        }).mount('#app');
+        },
+        mounted() {
+            this.getVerifyCode();
+        },
+        watch: {
+            checkParam(val) {
+                if (val.length === this.length) {
+                    this.check(val);
+                    location.reload();
+                }
+            },
+        },
+        methods: {
+            getVerifyCode() {
+                axios({
+                    method: 'get',
+                    url: '/api/verify-code/one',
+                }).then((response) => {
+                    this.image = 'data:image/jpeg;base64,' + response.data.data.image;
+                    this.length = response.data.data.length;
+                    this.imageId = response.data.data.imageId;
+                    this.checkParam = [];
+                }).catch(() => {
+                    this.image = 'https://bpic.588ku.com/element_origin_min_pic/01/37/32/26573c46f211bc8.jpg';
+                });
+            },
+            rectClick(event) {
+                let obj = {x1: event.offsetX / 344, y1: event.offsetY / 344};
+                this.checkParam = [...this.checkParam, obj];
+                this.mark(event.offsetX, event.offsetY)
+                // 获取相对于当前所指向对象的位置坐标
+                // alert('x:' + event.offsetX + "  y:" +  event.offsetY);
+            },
+            check(val) {
+                let that = this;
+                axios({
+                    method: 'post',
+                    url: '/api/verify-code/' + that.imageId,
+                    data: {verifyCode: val}
+                    // data: {verifyCode: JSON.stringify(val)}
+                    // params: {requestBody: JSON.stringify(val)}
+                }).then((response) => {
+                    let data = response.data;
+                    if (data.code !== 200) {
+                        alert("验证码验证异常" + data.message);
+                    } else {
+                        alert("验证通过");
+                    }
+                });
+            },
+            mark(left, top) {
+                const img = document.querySelector('#codeImg');
+                const markIcon = document.createElement('div');
+                markIcon.className = 'mark-icon';
+                markIcon.textContent = this.checkParam.length;
+                markIcon.setAttribute('style', `left: ${left}px; top: ${top}px`);
+                document.body.append(markIcon);
+            },
+        }
+    }).mount('#app');
 
-    </script>
-    <style>
-    </style>
+</script>
+
+<style>
+    .mark-icon {
+        width: 20px;
+        height: 20px;
+        text-align: center;
+        line-height: 20px;
+        border-radius: 50%;
+        background-color: blue;
+        color: #fff;
+        position: absolute;
+    }
+</style>
 </body>
 </html>
