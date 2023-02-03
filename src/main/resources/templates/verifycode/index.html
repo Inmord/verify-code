@@ -7,11 +7,40 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <!-- 生产环境版本，优化了尺寸和速度 -->
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <style>
+        .mark-icon {
+          width: 20px;
+          height: 20px;
+          text-align: center;
+          line-height: 20px;
+          border-radius: 50%;
+          background-color: red;
+          color: #fff;
+          position: absolute;
+        }
+        body {
+            display: flex;
+            height: 90vh;
+            align-items: center;
+            justify-content: center;
+            /*background-image: url('https://img.zcool.cn/community/01610455e6d1ed6ac7251df8bdd1b0.jpg@1280w_1l_2o_100sh.jpg');*/
+            background-image: url('https://img0.baidu.com/it/u=1962005201,380558339&fm=253&fmt=auto&app=138&f=JPEG?w=889&h=500');
+            background-size:cover;
+        }
+        #app {
+            padding: 20px;
+            text-align: center; 
+            position: relative;
+            border: 1px solid #ccc;
+            border-radius: 16px;
+        }
+    </style>
 </head>
 <body>
 
-<div id="app">
+<div id="app" >
     <img :src="image" id="codeImg" @click="rectClick"/>
+    <h3 style="color: #fff">请按图标顺序点击</h3>
 </div>
 <script>
     const {createApp} = Vue
@@ -74,12 +103,14 @@
                 });
             },
             mark(left, top) {
+                console.log(left, top)
+                const app = document.querySelector('#app');
                 const img = document.querySelector('#codeImg');
                 const markIcon = document.createElement('div');
                 markIcon.className = 'mark-icon';
                 markIcon.textContent = this.checkParam.length;
-                markIcon.setAttribute('style', `left: ${left}px; top: ${top}px`);
-                document.body.append(markIcon);
+                markIcon.setAttribute('style', `left: ${left + 20}px; top: ${top + 20}px`);
+                app.append(markIcon);
             },
         }
     }).mount('#app');
