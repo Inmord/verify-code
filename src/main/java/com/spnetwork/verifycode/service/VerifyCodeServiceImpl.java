@@ -41,7 +41,7 @@ public class VerifyCodeServiceImpl implements VerifyCodeService {
             imagesList = Files.list(rootPath).filter(path -> {
                 String fileName = path.toString();
                 return fileName.endsWith("jpg") || fileName.endsWith(".png");
-            }).toList();
+            }).collect(Collectors.toList());
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
@@ -72,7 +72,7 @@ public class VerifyCodeServiceImpl implements VerifyCodeService {
             }
 
             specialMap.put("image", imageBase64);
-            specialMap.put("length", txtAllLines.size() - 1);
+            specialMap.put("length", txtAllLines.size());
             specialMap.put("imageId", id);
             ans.put("data", specialMap);
         } catch (IOException e) {
@@ -115,11 +115,11 @@ public class VerifyCodeServiceImpl implements VerifyCodeService {
             BigDecimal dbX2Core = dbX2.divide(new BigDecimal(2)).setScale(4, RoundingMode.HALF_UP);
             BigDecimal dbY2Core = dbY2.divide(new BigDecimal(2)).setScale(4, RoundingMode.HALF_UP);;
             if (dbX1.subtract(dbX2Core).compareTo(x1) > -1 || dbX1.add(dbX2Core).compareTo(x1) < 1) {
-                return this.handleMsg(ans, 400004, "验证信息有误-" + i + "-x1异常");
+                return this.handleMsg(ans, 400004, "您点击的图标位置有误，请按照验证码的图标顺序依次点击");
             }
             BigDecimal dbY1 = new BigDecimal(lineArr[2]);
             if (dbY1.subtract(dbY2Core).compareTo(y1) > -1 || dbY1.add(dbY2Core).compareTo(y1) < 1) {
-                return this.handleMsg(ans, 400006, "验证信息有误-" + i + "-y1异常");
+                return this.handleMsg(ans, 400006, "您点击的图标位置有误，请按照验证码的图标顺序依次点击");
             }
         }
         return this.handleMsg(ans, 200, "OK");
